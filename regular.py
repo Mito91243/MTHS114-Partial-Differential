@@ -95,12 +95,12 @@ if not np.isinf(x_end):
 
 if not np.isinf(t_start):
  boundary_condition_t_start_expr = input(f"Enter the boundary condition u(x, {t_start}): ")
- boundary_condition_t_start_sympy = lambdify(t, boundary_condition_t_start_expr)
+ boundary_condition_t_start_sympy = lambdify(x, boundary_condition_t_start_expr)
 
 
 if not np.isinf(t_end):
  boundary_condition_t_end_expr = input(f"Enter the boundary condition u(x, {t_end}): ")
- boundary_condition_t_end_sympy = lambdify(t, boundary_condition_t_end_expr)
+ boundary_condition_t_end_sympy = lambdify(x, boundary_condition_t_end_expr)
 
 
 initial_condition_expr = input("Enter the initial condition: ")
@@ -126,21 +126,27 @@ def initial_condition(x_val):
 
 h = float(input("Enter H step: "))
 k = float(input("Enter K step: "))
-
+difference_type = input("Enter Difference Type: ")
 x_low = []
 x_up = []
 t_left = []
 t_right = []
 
-
-# If t_start is -inf, replace it with 0 for the boundary condition loop
-# Handle the inf loops to just substitute for 5 points at max
-t_start_for_loop = 0 if t_start == float('-inf') else t_start
-t_end_for_loop = 5*k if t_end == float('inf') else t_end
+#If BD we no upper limit aka t_start = -inf 
+#Make the k = -k so the step is in negative and make sure the t_end will be negtaive
+if difference_type == 'BD' and np.isinf(t_start):
+    k = -k  # make k negative for the backward step
+    t_start_for_loop = 0  # start from 0 for the loop
+    t_end_for_loop = -5 * abs(k)  # end at a large negative number for the loop
+else:
+    t_start_for_loop = t_start if not np.isinf(t_start) else 0
+    t_end_for_loop = t_end if not np.isinf(t_end) else 5 * k
+    
 x_start_for_loop = 0 if x_start == float('-inf') else x_start
 x_end_for_loop = 5*h if x_end == float('inf') else x_end
 
 # Example usage to test the boundary conditions
+# The if before each for loop just so we can ignore a boundary if given an infinity in a certain axis
 if not np.isinf(t_start):
   for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
     print(f"Boundary condition at u({i:.2f}, {t_start}):", "{:.2f}".format(boundary_condition_t_start(i)))
@@ -166,7 +172,6 @@ if not np.isinf(x_end):
   for i in np.arange(t_start_for_loop, t_end_for_loop+k , k):
    print(f"Boundary condition at u({x_end} , {i:.2f}):", "{:.2f}".format(boundary_condition_x_end(i)))
    t_right.append(boundary_condition_x_end(i))
-
 
 
 
