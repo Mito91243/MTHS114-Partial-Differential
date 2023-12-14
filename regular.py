@@ -83,6 +83,8 @@ t_start, t_end = parse_input(t_input)
 # Inf checks for boundary enteries
 # Convert sympy expressions to functions that can be used for calculations
 
+#******************************************************************************** Read Boundaries and Convert To Function ********************************************************************************
+
 if not np.isinf(x_start):
  boundary_condition_x_start_expr = input(f"Enter the boundary condition u({x_start}, t): ")
  boundary_condition_x_start_sympy = lambdify(t, boundary_condition_x_start_expr)
@@ -132,9 +134,11 @@ x_up = []
 t_left = []
 t_right = []
 
+#******************************************************************************** Mesh Creation and Case Handling for BD ********************************************************************************
+
 #If BD we no upper limit aka t_start = -inf 
 #Make the k = -k so the step is in negative and make sure the t_end will be negtaive
-if difference_type == 'BD' and np.isinf(t_start):
+if difference_type == 'BD' and np.isinf(t_start) and t_end == 0:
     k = -k  # make k negative for the backward step
     t_start_for_loop = 0  # start from 0 for the loop
     t_end_for_loop = -5 * abs(k)  # end at a large negative number for the loop
@@ -175,16 +179,8 @@ if not np.isinf(x_end):
 
 
 
-#print('*'*80)
-
-#print(x_low)
-
-#print('*'*80)
-
-#print(t_left)
-
-print('*'*80)
-
-#print(t_right)
-
-# Know which boundary equation to use  
+#******************************************************************************** Tasks ********************************************************************************
+#* If the same coordinates have 2 values you take their average 
+#* Get First Points that has 2 coordinates 
+#* Suggestion : Get All points and then look which one is needed in the question
+#* Use intial condition
