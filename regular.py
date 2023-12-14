@@ -149,33 +149,81 @@ else:
 x_start_for_loop = 0 if x_start == float('-inf') else x_start
 x_end_for_loop = 5*h if x_end == float('inf') else x_end
 
+
+
+
+grid_dict = {}
+
+
+# Helper Function to handle corner values
+def update_value(x, y):
+
+  if x == x_start and y == t_end or y == t_end and x == x_end or x == x_start and y == t_start or x == x_end and y == t_end:
+    key = (x,y)
+    existing_value = grid_dict[key]
+    if y == t_start:
+        average_value = (existing_value + boundary_condition_t_start(x)) / 2
+        grid_dict[key] = average_value
+    else: 
+        average_value = (existing_value + boundary_condition_t_end(x)) / 2
+        grid_dict[key] = average_value
+
+
+
+
+
+
+
+
+
 # Example usage to test the boundary conditions
 # The if before each for loop just so we can ignore a boundary if given an infinity in a certain axis
 if not np.isinf(t_start):
   for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
-    print(f"Boundary condition at u({i:.2f}, {t_start}):", "{:.2f}".format(boundary_condition_t_start(i)))
-    x_low.append(boundary_condition_t_start(i))
+    i = round(i,2)
+    grid_dict[i,t_start] = round(boundary_condition_t_start(i),1)
+    
 
-print('*'*80)
 
 if not np.isinf(t_end):
   for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
-    print(f"Boundary condition at u({i:.2f}, {t_end}):", "{:.2f}".format(boundary_condition_t_end(i)))
-    x_up.append(boundary_condition_t_end(i))
+    i = round(i,2)
+    grid_dict[i,t_end] = round(boundary_condition_t_end(i),2)
 
-print('*'*80)
 
 if not np.isinf(x_start):
   for i in np.arange(t_start_for_loop, t_end_for_loop+k, k):
-   print(f"Boundary condition at u({x_start} , {i:.2f}):", "{:.2f}".format(boundary_condition_x_start(i)))
-   t_left.append(boundary_condition_x_start(i))
+   i = round(i,2)
+   grid_dict[x_start,i] = round(boundary_condition_x_start(i),2)
+   update_value(x_start,i)
 
-print('*'*80)
+
 
 if not np.isinf(x_end):
   for i in np.arange(t_start_for_loop, t_end_for_loop+k , k):
-   print(f"Boundary condition at u({x_end} , {i:.2f}):", "{:.2f}".format(boundary_condition_x_end(i)))
-   t_right.append(boundary_condition_x_end(i))
+   i = round(i,2)
+   grid_dict[x_end,i] = round(boundary_condition_x_end(i),2)
+   update_value(x_end,i)
+
+
+for key, value in grid_dict.items():
+    print(f"Key: {key}, Value: {value}")
+
+
+
+
+#Tuple Key -> Dictionary
+
+
+
+
+
+
+
+
+
+
+
 
 
 
