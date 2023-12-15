@@ -1,20 +1,4 @@
-# Check for symmetry (for both regular) With 3 methods
-#   -> Around X , Y or X=Y
-#   -> Boundary Condition Same
-#   -> Check PDE substitute with point to the left and point to the right and get the same answer
-# Write PDE equation in a discrete form using finite difference formuala
-# Substitute for each point (the symmetry check part)
-# Solve the obtained Linear system of equations
-
-
-
-# REGULAR
-#  Import Regular Boundaries Formula Sheet
-#  If not mentioned Use Central Difference as mentioned
-#  Given Equation Uxx and Uyy
-#  If given Ux or Uy use Central difference as defualt unless mentioned
-
-
+# -----------------------------------------------------------
 # Givens
   # Uxx - u = 4Utt
   # Point
@@ -24,9 +8,6 @@
   # B.D or C.D or F.D
   # Mesh size H & K (horizontal & Vertical Step)
   # PDE Equation
-
-
-
 
 # Steps 
   # Draw The Region (When not given)
@@ -39,21 +20,11 @@
   # Get each point
   # Retrieve the Uxx or Uyy from formula sheet
   # Use these points in the equivalent pde equation to get the U
-
-
-# Tips
-  # Boundary Conditions are like 
-  # U(0,t) = 2t
-  # U(1,t) = t
-  # U(x,0) = 7
-  # But the equation you use to get the number from the Formula Sheet
-  # Looks like Ut(x,0) = x^2
-  # We retrieve the function from Formula sheet and equate it to X^2 for example
-
+# -----------------------------------------------------------
 
 
 import numpy as np
-from sympy import symbols, lambdify
+from sympy import symbols, lambdify, sympify
 
 # Define symbols for sympy
 x, t = symbols('x t')
@@ -105,10 +76,7 @@ if not np.isinf(t_end):
  boundary_condition_t_end_sympy = lambdify(x, boundary_condition_t_end_expr)
 
 
-initial_condition_expr = input("Enter the initial condition: ")
-
 # Convert the user input strings into sympy expressions
-initial_condition_sympy = lambdify(x, initial_condition_expr)
 
 def boundary_condition_x_start(t_val):
     return boundary_condition_x_start_sympy(t_val)
@@ -123,8 +91,42 @@ def boundary_condition_t_end(t_val):
     return boundary_condition_t_end_sympy(t_val)
 
 
-def initial_condition(x_val):
-    return initial_condition_sympy(x_val)
+#******************************************************************************** Initial Condition ********************************************************************************
+
+
+def create_function_from_user_input():
+    # Prompt the user to enter the equation or a number
+    user_input = input("Enter the expression (e.g., 'x**2', '5 + t') or a number: ").strip()
+
+    # Check if the input is just a number
+    if user_input.replace('.', '', 1).isdigit():
+        # If it's just a number, create a function that always returns this number
+        value = float(user_input)
+        return lambda var: value  # var is a dummy variable, the function always returns 'value'
+    
+    # If the input is not just a number, proceed to check if it's in terms of 'x' or 't'
+    variable = None
+    if 'x' in user_input:
+        variable = x
+    elif 't' in user_input:
+        variable = t
+    else:
+        raise ValueError("The input must be an expression in terms of 'x' or 't', or just a number.")
+
+    # Parse the user input into a sympy expression
+    expression = sympify(user_input, evaluate=False)
+
+    # Create a callable function from the sympy expression
+    func = lambdify(variable, expression, modules=['numpy'])
+
+    return func
+
+# Create the function from user input
+user_defined_function = create_function_from_user_input()
+
+
+
+#******************************************************************************** Mesh Creation and Case Handling for BD ********************************************************************************
 
 h = float(input("Enter H step: "))
 k = float(input("Enter K step: "))
@@ -134,7 +136,6 @@ x_up = []
 t_left = []
 t_right = []
 
-#******************************************************************************** Mesh Creation and Case Handling for BD ********************************************************************************
 
 #If BD we no upper limit aka t_start = -inf 
 #Make the k = -k so the step is in negative and make sure the t_end will be negtaive
@@ -149,10 +150,10 @@ else:
 x_start_for_loop = 0 if x_start == float('-inf') else x_start
 x_end_for_loop = 5*h if x_end == float('inf') else x_end
 
-
-
-
 grid_dict = {}
+for i in np.arange(t_start_for_loop, t_end_for_loop+k, k):
+   for j in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+      grid_dict[round(j,2),round(i,2)] = 0
 
 
 # Helper Function to handle corner values
@@ -172,29 +173,25 @@ def update_value(x, y):
 
 
 
-
-
-
-
 # Example usage to test the boundary conditions
 # The if before each for loop just so we can ignore a boundary if given an infinity in a certain axis
 if not np.isinf(t_start):
   for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
     i = round(i,2)
-    grid_dict[i,t_start] = round(boundary_condition_t_start(i),1)
+    grid_dict[i,t_start] = round(boundary_condition_t_start(i),5)
     
 
 
 if not np.isinf(t_end):
   for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
     i = round(i,2)
-    grid_dict[i,t_end] = round(boundary_condition_t_end(i),2)
+    grid_dict[i,t_end] = round(boundary_condition_t_end(i),5)
 
 
 if not np.isinf(x_start):
   for i in np.arange(t_start_for_loop, t_end_for_loop+k, k):
    i = round(i,2)
-   grid_dict[x_start,i] = round(boundary_condition_x_start(i),2)
+   grid_dict[x_start,i] = round(boundary_condition_x_start(i),5)
    update_value(x_start,i)
 
 
@@ -202,7 +199,7 @@ if not np.isinf(x_start):
 if not np.isinf(x_end):
   for i in np.arange(t_start_for_loop, t_end_for_loop+k , k):
    i = round(i,2)
-   grid_dict[x_end,i] = round(boundary_condition_x_end(i),2)
+   grid_dict[x_end,i] = round(boundary_condition_x_end(i),5)
    update_value(x_end,i)
 
 
@@ -210,25 +207,64 @@ for key, value in grid_dict.items():
     print(f"Key: {key}, Value: {value}")
 
 
-
-
-#Tuple Key -> Dictionary
-
+#******************************************************************************** Formulas ********************************************************************************
 
 
 
+#************************************************** Backward ************************************************** 
+
+# Temporary dictionary for updates
+updates_dict = {}
+
+def backward_diff(key, k, func):
+   val_boundary = grid_dict[key]
+   val = val_boundary - (k * func(key[0]))
+   updates_dict[(key[0], key[1]-k)] = val
+   print(f"At x: {key[0]} , At y: {key[1]} , Value is {val}")
 
 
+# Calculate backward differences but store them in updates_dict
+for key, value in list(grid_dict.items()):
+    #Check which is bigger the upper or lower boundary
+    if t_end > t_start:
+        #if we are on the upper boundary
+        if key[1] == t_end:
+            if key[0] != x_start and key[0] != x_end:      
+                backward_diff(key, k, user_defined_function)
+
+# Now apply the updates to grid_dict
+grid_dict.update(updates_dict)
 
 
+#************************************************** Backward ************************************************** 
 
 
+#************************************************** Forward ************************************************** 
+
+# Forward Difference Formula
+"""def forward_diff(x,t,value):
+   LHS = ()/k
 
 
+# FORWARD DIFFERENCE IMPLEMENTATION
+for key, value in grid_dict.items():
+    if key[0] == t_start:
+       if not key == (x_start,t_start) or not key == (x_start , t_end):
+          forward_diff(key[0],0,grid_dict[key])          
+"""
+
+#************************************************** Forward ************************************************** 
+
+
+#************************************************** Central ************************************************** 
+
+# To be Implemented
+
+#************************************************** Central ************************************************** 
 
 
 #******************************************************************************** Tasks ********************************************************************************
-#* If the same coordinates have 2 values you take their average 
-#* Get First Points that has 2 coordinates 
-#* Suggestion : Get All points and then look which one is needed in the question
-#* Use intial condition
+#* Implement Forward Diffrence and Central Difference
+#* Finish the Backward Difference Equation
+#* Take input point from user
+#* Take input pde from user
