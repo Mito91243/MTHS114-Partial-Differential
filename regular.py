@@ -29,6 +29,7 @@ from sympy import symbols, lambdify, sympify
 # Define symbols for sympy
 x, t = symbols('x t')
 
+
 # Ask for the range of x and t
 x_input = input("Enter the x-axis range (start and end) separated by space, use 'inf' for infinity: ")
 t_input = input("Enter the t-axis range (start and end) separated by space, use 'inf' for infinity: ")
@@ -213,28 +214,27 @@ for key, value in grid_dict.items():
 
 #************************************************** Backward ************************************************** 
 
+if difference_type == "BD":
 # Temporary dictionary for updates
-updates_dict = {}
+ updates_dict = {}
 
-def backward_diff(key, k, func):
+ def backward_diff(key, k, func):
    val_boundary = grid_dict[key]
    val = val_boundary - (k * func(key[0]))
    updates_dict[(key[0], key[1]-k)] = val
-   print(f"At x: {key[0]} , At y: {key[1]} , Value is {val}")
+   #print(f"At x: {key[0]} , At y: {key[1]} , Value is {val}")
 
 
-# Calculate backward differences but store them in updates_dict
-for key, value in list(grid_dict.items()):
+ # Calculate backward differences but store them in updates_dict
+ for key, value in list(grid_dict.items()):
     #Check which is bigger the upper or lower boundary
     if t_end > t_start:
         #if we are on the upper boundary
         if key[1] == t_end:
             if key[0] != x_start and key[0] != x_end:      
                 backward_diff(key, k, user_defined_function)
-
-# Now apply the updates to grid_dict
-grid_dict.update(updates_dict)
-
+ # Now apply the updates to grid_dict
+ grid_dict.update(updates_dict)
 
 #************************************************** Backward ************************************************** 
 
@@ -258,7 +258,27 @@ for key, value in grid_dict.items():
 
 #************************************************** Central ************************************************** 
 
-# To be Implemented
+if difference_type == "CD":
+# Temporary dictionary for updates
+ updates_dict = {}
+
+ def Central_diff(key, k, func):
+   val_boundary = grid_dict[key]
+   val = val_boundary - (k * func(key[0]))
+   updates_dict[(key[0], key[1]-k)] = val
+   #print(f"At x: {key[0]} , At y: {key[1]} , Value is {val}")
+
+
+ # Calculate backward differences but store them in updates_dict
+ for key, value in list(grid_dict.items()):
+    #Check which is bigger the upper or lower boundary
+    if t_end > t_start:
+        #if we are on the upper boundary
+        if key[1] == t_end:
+            if key[0] != x_start and key[0] != x_end:      
+                Central_diff(key, k, user_defined_function)
+ # Now apply the updates to grid_dict
+ grid_dict.update(updates_dict)
 
 #************************************************** Central ************************************************** 
 
