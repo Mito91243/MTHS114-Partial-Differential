@@ -209,7 +209,9 @@ for key, value in grid_dict.items():
 
 
 #******************************************************************************** Formulas ********************************************************************************
-
+# If grid is in the -Y direction get the correct K again
+if k < 0:
+  k = -k
 
 
 #************************************************** Backward ************************************************** 
@@ -222,7 +224,7 @@ if difference_type == "BD":
    val_boundary = grid_dict[key]
    val = val_boundary - (k * func(key[0]))
    updates_dict[(key[0], key[1]-k)] = val
-   #print(f"At x: {key[0]} , At y: {key[1]} , Value is {val}")
+   print(f"At x: {key[0]} , At y: {key[1]-k} , Value is {val}")
 
 
  # Calculate backward differences but store them in updates_dict
