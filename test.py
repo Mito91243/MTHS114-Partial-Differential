@@ -62,7 +62,7 @@ pde_input = input("Enter PDE: ")
 # Create the finite difference PDE
 fd_pde = create_pde(pde_input)
 
-def evaluate_pde_at_key(pde, grid_dict, key, h_val, k_val):
+def evaluate_pde_at_key(key, h_val, k_val):
     # Substitute the key into the PDE
     x_val, t_val = key
 
@@ -80,7 +80,7 @@ def evaluate_pde_at_key(pde, grid_dict, key, h_val, k_val):
     }
 
     # Substitute the finite difference expressions into the PDE
-    pde_evaluated = pde.subs(subs_dict)
+    pde_evaluated = fd_pde.subs(subs_dict)
 
     return pde_evaluated
 
@@ -94,11 +94,11 @@ grid_dict = {
     (1, 0.8): 1
 }
 key = (1, 1)
-h_val = 2
-k_val = 2
+hh = 2
+kk = 2
 
 # Evaluate the PDE at the key
-evaluated_pde = evaluate_pde_at_key(fd_pde, grid_dict, key, h_val, k_val)
+evaluated_pde = evaluate_pde_at_key(key, hh, kk)
 
 print("Evaluated PDE at key:", evaluated_pde)
 # Solve the equation for x
