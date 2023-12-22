@@ -53,8 +53,7 @@ def create_pde(user_pde_input):
     rhs_expr = sympify(rhs_term, locals=sympy_locals)
 
     # Create the PDE as an equation
-    pde = Eq(lhs_expr, rhs_expr)
-
+    pde = Eq(lhs_expr, rhs_expr, evaluate=False)
     return pde
 
 # Example PDE input from the user
@@ -65,10 +64,22 @@ fd_pde = create_pde(pde_input)
 
 def evaluate_pde_at_key(pde, grid_dict, key, h_val, k_val):
     # Substitute the key into the PDE
-    pde_substituted = pde.subs({x: key[0], t: key[1], h: h_val, k: k_val})
+    x_val, t_val = key
 
-    # Evaluate the PDE using the grid dictionary
-    pde_evaluated = pde_substituted.subs({u(x, t): grid_dict.get(key, 0)})
+    # Create a dictionary of all terms that need to be substituted
+    subs_dict = {
+        u(x, t): grid_dict.get((x_val, t_val), 0),
+        u(x+h, t): grid_dict.get((x_val+h_val, t_val), 0),
+        u(x-h, t): grid_dict.get((x_val-h_val, t_val), 0),
+        u(x, t+k): grid_dict.get((x_val, t_val+k_val), 0),
+        u(x, t-k): grid_dict.get((x_val, t_val-k_val), 0),
+        h: h_val,
+        k: k_val
+        # Add more substitutions for other terms if needed
+    }
+
+    # Substitute the finite difference expressions into the PDE
+    pde_evaluated = pde.subs(subs_dict)
 
     return pde_evaluated
 
