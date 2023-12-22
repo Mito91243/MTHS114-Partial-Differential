@@ -3,32 +3,32 @@
 from sympy import symbols, Function, Eq, sympify, solve
 
 # Define symbols
-x, t, h, k = symbols('x t h k')
+x, t, h_val, k_val = symbols('x t h k')
 u = Function('u')
 
 difference_type = "FD"
 # Define the finite difference expressions using SymPy
 def uxx():
-    return (u(x+h, t) - 2*u(x, t) + u(x-h, t)) / h**2
+    return (u(x+h_val, t) - 2*u(x, t) + u(x-h_val, t)) / h_val**2
 
 def utt():
-    return (u(x, t+k) - 2*u(x, t) + u(x, t-k)) / k**2
+    return (u(x, t+k_val) - 2*u(x, t) + u(x, t-k_val)) / k_val**2
 
 def ux():
     if difference_type == "FD":
-     return (u(x+h, t) - u(x, t)) / h
+     return (u(x+h_val, t) - u(x, t)) / h_val
     elif difference_type == "BD":
-     return (u(x+h, t) - u(x-h, t)) / h
+     return (u(x+h_val, t) - u(x-h_val, t)) / h_val
     elif difference_type == "CD":
-     return (u(x+h, t) - u(x-h, t)) / h*2
+     return (u(x+h_val, t) - u(x-h_val, t)) / h_val*2
     
 def ut():
     if difference_type == "FD":
-     return (u(x, t+k) - u(x, t)) / k
+     return (u(x, t+k_val) - u(x, t)) / k_val
     elif difference_type == "BD":
-     return (u(x, t) - u(x, t-k)) / k
+     return (u(x, t) - u(x, t-k_val)) / k_val
     elif difference_type == "CD":
-     return (u(x, t+k) - u(x, t-k)) / k*2
+     return (u(x, t+k_val) - u(x, t-k_val)) / k_val*2
 
 
 
@@ -62,7 +62,7 @@ pde_input = input("Enter PDE: ")
 # Create the finite difference PDE
 fd_pde = create_pde(pde_input)
 
-def evaluate_pde_at_key(key, h_val, k_val):
+def evaluate_pde_at_key(key, h, k):
     # Substitute the key into the PDE
     x_val, t_val = key
 
@@ -70,12 +70,12 @@ def evaluate_pde_at_key(key, h_val, k_val):
     subs_dict = {
        #replace with x if we are at a point in the grid that has value 0 aka unkown value
         u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
-        u(x+h, t): x+h if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
-        u(x-h, t): x-h if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
-        u(x, t+k): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
-        u(x, t-k): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
-        h: h_val,
-        k: k_val
+        u(x+h_val, t): x+h_val if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
+        u(x-h_val, t): x-h_val if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
+        u(x, t+k_val): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
+        u(x, t-k_val): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
+        h_val: h,
+        k_val: k
         # Add more substitutions for other terms if needed
     }
 
@@ -94,11 +94,11 @@ grid_dict = {
     (1, 0.8): 1
 }
 key = (1, 1)
-hh = 2
-kk = 2
+h = 2
+k = 2
 
 # Evaluate the PDE at the key
-evaluated_pde = evaluate_pde_at_key(key, hh, kk)
+evaluated_pde = evaluate_pde_at_key(key, h, k)
 
 print("Evaluated PDE at key:", evaluated_pde)
 # Solve the equation for x
