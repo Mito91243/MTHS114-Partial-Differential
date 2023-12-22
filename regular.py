@@ -24,7 +24,7 @@
 
 
 import numpy as np
-from sympy import symbols, lambdify, sympify
+from sympy import symbols, lambdify, sympify, solve, Function, Eq
 
 # Define symbols for sympy
 x, t = symbols('x t')
@@ -272,21 +272,100 @@ if difference_type == "FD":
 
 #************************************************** PDE ************************************************** 
  
+h_val, k_val = symbols('h k')
+u = Function('u')
 
+# Define the finite difference expressions using SymPy
+def uxx():
+    return (u(x+h_val, t) - 2*u(x, t) + u(x-h_val, t)) / h_val**2
+
+def utt():
+    return (u(x, t+k_val) - 2*u(x, t) + u(x, t-k_val)) / k_val**2
+
+def ux():
+    if difference_type == "FD":
+     return (u(x+h_val, t) - u(x, t)) / h_val
+    elif difference_type == "BD":
+     return (u(x+h_val, t) - u(x-h_val, t)) / h_val
+    elif difference_type == "CD":
+     return (u(x+h_val, t) - u(x-h_val, t)) / h_val*2
+    
+def ut():
+    if difference_type == "FD":
+     return (u(x, t+k_val) - u(x, t)) / k_val
+    elif difference_type == "BD":
+     return (u(x, t) - u(x, t-k_val)) / k_val
+    elif difference_type == "CD":
+     return (u(x, t+k_val) - u(x, t-k_val)) / k_val*2
+
+
+
+# Function to create a PDE using finite difference formulas
+def create_pde(user_pde_input):
+    # Parse the user input
+    lhs_term = user_pde_input.split('=')[0].strip()
+    rhs_term = user_pde_input.split('=')[1].strip()
+
+    sympy_locals = {
+        'u': u(x, t),
+        'uxx': uxx(),
+        'utt': utt(),
+        'ux': ux(),
+        'ut': ut()
+    }
+
+    # Handle the left hand side of the pde as a general expression
+    lhs_expr = sympify(lhs_term, locals=sympy_locals)
+
+    # Handle the right-hand side of the PDE as a general expression
+    rhs_expr = sympify(rhs_term, locals=sympy_locals)
+
+    # Create the PDE as an equation
+    pde = Eq(lhs_expr, rhs_expr)
+    return pde
+
+# Example PDE input from the user
+pde_input = input("Enter PDE: ")
+
+# Create the finite difference PDE
+fd_pde = create_pde(pde_input)
+
+def evaluate_pde_at_key(key, h, k):
+    # Substitute the key into the PDE
+    x_val, t_val = key
+
+    # Create a dictionary of all terms that need to be substituted
+    subs_dict = {
+       #replace with x if we are at a point in the grid that has value 0 aka unkown value
+        u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
+        u(x+h_val, t): x+h_val if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
+        u(x-h_val, t): x-h_val if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
+        u(x, t+k_val): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
+        u(x, t-k_val): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
+        h_val: h,
+        k_val: k
+        # Add more substitutions for other terms if needed
+    }
+
+    # Substitute the finite difference expressions into the PDE
+    pde_evaluated = fd_pde.subs(subs_dict)
+
+    return pde_evaluated
+
+
+# Evaluate the PDE at the wanted key
+# TASK: FOR LOOP GOES HERE TO CALCULATE ALL GRID WITH GIVEN PDE
+evaluated_pde = evaluate_pde_at_key(key, h, k)
+
+print("Evaluated PDE at key:", evaluated_pde)
+# Solve the equation for x
+solution = solve(evaluated_pde, x)
+print("Solution for x: ", solution)
 
  
 #************************************************** PDE ************************************************** 
 
-
-
-
-
-
-
-
-
-
-
+    
 
 #************************************************** Central ************************************************** 
 """
