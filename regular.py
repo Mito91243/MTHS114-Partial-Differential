@@ -204,8 +204,8 @@ if not np.isinf(x_end):
    update_value(x_end,i)
 
 
-for key, value in grid_dict.items():
-    print(f"Key: {key}, Value: {value}")
+#for key, value in grid_dict.items():
+    #print(f"Key: {key}, Value: {value}")
 
 
 #******************************************************************************** Formulas ********************************************************************************
@@ -220,11 +220,11 @@ if difference_type == "BD":
 # Temporary dictionary for updates
  updates_dict = {}
 
- def backward_diff(key, k, func):
+ def backward_diff(key):
    val_boundary = grid_dict[key]
-   val = val_boundary - (k * func(key[0]))
+   val = val_boundary - (k * user_defined_function(key[0]))
    updates_dict[(key[0], key[1]-k)] = val
-   print(f"At x: {key[0]} , At y: {key[1]-k} , Value is {val}")
+   #print(f"At x: {key[0]} , At y: {key[1]-k} , Value is {val}")
 
 
  # Calculate backward differences but store them in updates_dict
@@ -234,7 +234,7 @@ if difference_type == "BD":
         #if we are on the upper boundary
         if key[1] == t_end:
             if key[0] != x_start and key[0] != x_end:      
-                backward_diff(key, k, user_defined_function)
+                backward_diff(key)
  # Now apply the updates to grid_dict
  grid_dict.update(updates_dict)
 
@@ -243,23 +243,32 @@ if difference_type == "BD":
 
 #************************************************** Forward ************************************************** 
 
-# Forward Difference Formula
-"""def forward_diff(x,t,value):
-   LHS = ()/k
+if difference_type == "FD":
+# Temporary dictionary for updates
+ updates_dict = {}
+
+ def forward_diff(key):
+   val_boundary = grid_dict[key]
+   val = val_boundary + (k * user_defined_function(key[0]))
+   updates_dict[(key[0], key[1]+k)] = val
+   #print(f"At x: {key[0]} , At y: {round(key[1]+k,2)} , Value is {val}")
 
 
-# FORWARD DIFFERENCE IMPLEMENTATION
-for key, value in grid_dict.items():
-    if key[0] == t_start:
-       if not key == (x_start,t_start) or not key == (x_start , t_end):
-          forward_diff(key[0],0,grid_dict[key])          
-"""
+ # Calculate backward differences but store them in updates_dict
+ for key, value in list(grid_dict.items()):
+    #if we are on the upper boundary
+        if key[1] == t_start:
+            if key[0] != x_start and key[0] != x_end:      
+                forward_diff(key)
+ 
+ # Now apply the updates to grid_dict
+ grid_dict.update(updates_dict)
 
 #************************************************** Forward ************************************************** 
 
 
 #************************************************** Central ************************************************** 
-
+"""
 if difference_type == "CD":
 # Temporary dictionary for updates
  updates_dict = {}
@@ -281,6 +290,7 @@ if difference_type == "CD":
                 Central_diff(key, k, user_defined_function)
  # Now apply the updates to grid_dict
  grid_dict.update(updates_dict)
+"""
 
 #************************************************** Central ************************************************** 
 
