@@ -1,45 +1,56 @@
 # TESTING THE PDE INPUT
 
-"""
 from sympy import symbols, Function, Eq, sympify
 
 # Define symbols
 x, t, h, k = symbols('x t h k')
 u = Function('u')
 
+difference_type = "FD"
 # Define the finite difference expressions using SymPy
-def uxx(u, x, t, h):
+def uxx():
     return (u(x+h, t) - 2*u(x, t) + u(x-h, t)) / h**2
 
-def uyy(u, x, t, k):
+def utt():
     return (u(x, t+k) - 2*u(x, t) + u(x, t-k)) / k**2
 
+def ux():
+    if difference_type == "FD":
+     return (u(x+h, t) - u(x, t)) / h
+    elif difference_type == "BD":
+     return (u(x+h, t) - u(x-h, t)) / h
+    elif difference_type == "CD":
+     return (u(x+h, t) - u(x-h, t)) / h*2
+    
+def ut():
+    if difference_type == "FD":
+     return (u(x, t+k) - u(x, t)) / k
+    elif difference_type == "BD":
+     return (u(x, t) - u(x, t-k)) / k
+    elif difference_type == "CD":
+     return (u(x, t+k) - u(x, t-k)) / k*2
+
+
+
 # Function to create a PDE using finite difference formulas
-def create_fd_pde(user_pde_input):
+def create_pde(user_pde_input):
     # Parse the user input
-    lhs_terms = user_pde_input.split('=')[0].split('+')
+    lhs_term = user_pde_input.split('=')[0].strip()
     rhs_term = user_pde_input.split('=')[1].strip()
 
-    # Initialize the left-hand side of the PDE
-    lhs_expr = 0
+    sympy_locals = {
+        'u': u(x, t),
+        'uxx': uxx(),
+        'utt': utt(),
+        'ux': ux(),
+        'ut': ut()
+    }
 
-    # Add each term to the left-hand side expression
-    for term in lhs_terms:
-        term = term.strip()
-        if term == 'uxx':
-            lhs_expr += uxx(u, x, t, h)
-        elif term == 'uyy':
-            lhs_expr += uyy(u, x, t, k)
-        elif term == 'u' or term == 'uxt':
-            lhs_expr += u(x, t)
+    # Handle the left hand side of the pde as a general expression
+    lhs_expr = sympify(lhs_term, locals=sympy_locals)
 
-    # Handle the right-hand side of the PDE
-    if rhs_term == 'u':
-        rhs_expr = u(x, t)
-    else:
-        # If the term is a multiple of 'u', like '2*u'
-        coeff, _ = rhs_term.split('*')
-        rhs_expr = sympify(coeff) * u(x, t)
+    # Handle the right-hand side of the PDE as a general expression
+    rhs_expr = sympify(rhs_term, locals=sympy_locals)
 
     # Create the PDE as an equation
     pde = Eq(lhs_expr, rhs_expr)
@@ -47,21 +58,40 @@ def create_fd_pde(user_pde_input):
     return pde
 
 # Example PDE input from the user
-user_pde_input = input("Enter PDE: ")
+pde_input = input("Enter PDE: ")
 
 # Create the finite difference PDE
-fd_pde = create_fd_pde(user_pde_input)
+fd_pde = create_pde(pde_input)
 
-# Print the PDE
-print(fd_pde)
-"""
+def evaluate_pde_at_key(pde, grid_dict, key, h_val, k_val):
+    # Substitute the key into the PDE
+    pde_substituted = pde.subs({x: key[0], t: key[1], h: h_val, k: k_val})
+
+    # Evaluate the PDE using the grid dictionary
+    pde_evaluated = pde_substituted.subs({u(x, t): grid_dict.get(key, 0)})
+
+    return pde_evaluated
+
+
+# Example grid dictionary and key
+grid_dict = {(1, 1): 3, (1.2, 1): 4, (0.8, 1): 2, (1, 1.2): 5, (1, 0.8): 1}
+key = (1, 1)
+h_val = 2
+k_val = 2
+
+# Evaluate the PDE at the key
+evaluated_pde = evaluate_pde_at_key(fd_pde, grid_dict, key, h_val, k_val)
+
+print("Evaluated PDE at key:", evaluated_pde)
+
+
 
 
 
 
 
 # TESTING THE INITIAL CONDITIONS
-
+"""
 from sympy import symbols, lambdify, sympify
 
 # Define symbols for sympy
@@ -123,3 +153,81 @@ for key, func in user_defined_functions.items():
         # Test with some t value, for example t = 2
         test_value = 2
         print(f"Initial condition at t = {key[0]}, test_value = {test_value}: u = {func(test_value)}")
+
+        """
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+
+# Define the finite difference expressions using SymPy
+def uxx(key):
+    if key == 0:
+       return x
+    
+    return (grid_dict(key[0]+h, key[1]) - 2*grid_dict(key[0], key[1]) + grid_dict(key[0]-h, key[1])) / h**2
+
+def utt(key):
+    if key == 0:
+       return x
+       
+    return (grid_dict(key[0], key[1]+k) - 2*grid_dict(key[0], key[1]) + grid_dict(key[0], key[1]-k)) / k**2
+
+def ux(key):
+    if key == 0:
+       return x
+    
+    if difference_type == "FD":
+     return (grid_dict(key[0]+h, key[1]) - grid_dict(key[0], key[1])) / h
+    elif difference_type == "BD":
+     return (grid_dict(key[0]+h, key[1]) - grid_dict(key[0]-h, key[1])) / h
+    elif difference_type == "CD":
+     return (grid_dict(key[0]+h, key[1]) - grid_dict(key[0]-h, key[1])) / h*2
+    
+def ut(key):
+    if key == 0:
+       return x
+
+    if difference_type == "FD":
+     return (grid_dict(key[0], key[1]+k) - grid_dict(key[0], key[1])) / k
+    elif difference_type == "BD":
+     return (grid_dict(key[0], key[1]) - grid_dict(key[0], key[1]-k)) / k
+    elif difference_type == "CD":
+     return (grid_dict(key[0], key[1]+k) - grid_dict(key[0], key[1]-k)) / k*2
+
+
+
+# Function to create a PDE using finite difference formulas
+def create_pde(user_pde_input):
+    # Parse the user input
+    lhs_term = user_pde_input.split('=')[0].strip()
+    rhs_term = user_pde_input.split('=')[1].strip()
+
+    # Handle the left hand side of the pde as a general expression
+    lhs_expr = sympify(lhs_term, locals={'u': grid_dict(x, t) if grid_dict(x,t) != 0 else x, 'ux': ux(key), 'ut': ut(key),'utt': utt(key),'uxx': uxx(key)})
+
+    # Handle the right-hand side of the PDE as a general expression
+    rhs_expr = sympify(rhs_term, locals={'u': grid_dict(x, t) if grid_dict(x,t) != 0 else x, 'ux': ux(key), 'ut': ut(key),'utt': utt(key),'uxx': uxx(key)})
+
+    # Create the PDE as an equation
+    pde = Eq(lhs_expr, rhs_expr)
+
+    return pde
+
+# Example PDE input from the user
+pde_input = input("Enter PDE: ")
+
+# Create the finite difference PDE
+fd_pde = create_pde(pde_input)
+
+"""
