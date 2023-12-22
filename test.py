@@ -1,6 +1,6 @@
 # TESTING THE PDE INPUT
 
-from sympy import symbols, Function, Eq, sympify
+from sympy import symbols, Function, Eq, sympify, solve
 
 # Define symbols
 x, t, h, k = symbols('x t h k')
@@ -53,7 +53,7 @@ def create_pde(user_pde_input):
     rhs_expr = sympify(rhs_term, locals=sympy_locals)
 
     # Create the PDE as an equation
-    pde = Eq(lhs_expr, rhs_expr, evaluate=False)
+    pde = Eq(lhs_expr, rhs_expr)
     return pde
 
 # Example PDE input from the user
@@ -68,11 +68,12 @@ def evaluate_pde_at_key(pde, grid_dict, key, h_val, k_val):
 
     # Create a dictionary of all terms that need to be substituted
     subs_dict = {
-        u(x, t): grid_dict.get((x_val, t_val), 0),
-        u(x+h, t): grid_dict.get((x_val+h_val, t_val), 0),
-        u(x-h, t): grid_dict.get((x_val-h_val, t_val), 0),
-        u(x, t+k): grid_dict.get((x_val, t_val+k_val), 0),
-        u(x, t-k): grid_dict.get((x_val, t_val-k_val), 0),
+       #replace with x if we are at a point in the grid that has value 0 aka unkown value
+        u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
+        u(x+h, t): x+h if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
+        u(x-h, t): x-h if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
+        u(x, t+k): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
+        u(x, t-k): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
         h: h_val,
         k: k_val
         # Add more substitutions for other terms if needed
@@ -85,7 +86,13 @@ def evaluate_pde_at_key(pde, grid_dict, key, h_val, k_val):
 
 
 # Example grid dictionary and key
-grid_dict = {(1, 1): 3, (1.2, 1): 4, (0.8, 1): 2, (1, 1.2): 5, (1, 0.8): 1}
+grid_dict = {
+    (1, 1): 3, 
+    (1.2, 1): 4, 
+    (0.8, 1): 2, 
+    (1, 1.2): 0,  # Set the value of utt to 0
+    (1, 0.8): 1
+}
 key = (1, 1)
 h_val = 2
 k_val = 2
@@ -94,6 +101,9 @@ k_val = 2
 evaluated_pde = evaluate_pde_at_key(fd_pde, grid_dict, key, h_val, k_val)
 
 print("Evaluated PDE at key:", evaluated_pde)
+# Solve the equation for x
+solution = solve(evaluated_pde, x)
+print("Solution for x: ", solution)
 
 
 
