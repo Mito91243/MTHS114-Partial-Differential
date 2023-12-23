@@ -70,8 +70,8 @@ def evaluate_pde_at_key(key, h, k):
     subs_dict = {
        #replace with x if we are at a point in the grid that has value 0 aka unkown value
         u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
-        u(x+h_val, t): x+h_val if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
-        u(x-h_val, t): x-h_val if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
+        u(x+h_val, t): x if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
+        u(x-h_val, t): x if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
         u(x, t+k_val): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
         u(x, t-k_val): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
         h_val: h,
@@ -87,15 +87,15 @@ def evaluate_pde_at_key(key, h, k):
 
 # Example grid dictionary and key
 grid_dict = {
-    (1, 1): 3, 
-    (1.2, 1): 4, 
-    (0.8, 1): 2, 
-    (1, 1.2): 0,  # Set the value of utt to 0
-    (1, 0.8): 1
+    (0.4, 0.3): 7.048, 
+    (0.6, 0.3): 7.108, 
+    (0.2, 0.3): 7.012, 
+    (0.4, 0.6): 0,  # Set the value of utt to 0
+    (0.4, 0): 7
 }
-key = (1, 1)
-h = 2
-k = 2
+key = (0.4, 0.3)
+h = 0.2
+k = 0.3
 
 # Evaluate the PDE at the key
 evaluated_pde = evaluate_pde_at_key(key, h, k)

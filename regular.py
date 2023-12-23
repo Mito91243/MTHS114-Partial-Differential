@@ -338,10 +338,10 @@ def evaluate_pde_at_key(key, h, k):
     subs_dict = {
        #replace with x if we are at a point in the grid that has value 0 aka unkown value
         u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
-        u(x+h_val, t): x+h_val if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
-        u(x-h_val, t): x-h_val if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
-        u(x, t+k_val): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
-        u(x, t-k_val): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
+        u(x+h_val, t): x if grid_dict.get((x_val+h, t_val), 0) == 0 else grid_dict.get((x_val+h, t_val), 0),
+        u(x-h_val, t): x if grid_dict.get((x_val-h, t_val), 0) == 0 else grid_dict.get((x_val-h, t_val), 0),
+        u(x, t+k_val): x if grid_dict.get((x_val, t_val+k), 0) == 0 else grid_dict.get((x_val, t_val+k), 0),
+        u(x, t-k_val): x if grid_dict.get((x_val, t_val-k), 0) == 0 else grid_dict.get((x_val, t_val-k), 0),
         h_val: h,
         k_val: k
         # Add more substitutions for other terms if needed
@@ -355,7 +355,23 @@ def evaluate_pde_at_key(key, h, k):
 
 # Evaluate the PDE at the wanted key
 # TASK: FOR LOOP GOES HERE TO CALCULATE ALL GRID WITH GIVEN PDE
-evaluated_pde = evaluate_pde_at_key(key, h, k)
+kkey = (0.5,0.8)
+
+
+
+
+#TESTNG
+print(f"at x: {kkey[0]} at y: {kkey[1]} value is: {grid_dict[kkey[0],kkey[1]]}")
+print(f"at x: {round(kkey[0]+h,2)} at y: {kkey[1]} value is: {grid_dict[round(kkey[0]+h,2),round(kkey[1],2)]}")
+print(f"at x: {kkey[0]-h} at y: {kkey[1]} value is: {grid_dict[round(kkey[0]-h,2),kkey[1]]}")
+print(f"at x: {kkey[0]} at y: {kkey[1]+k} value is: {grid_dict[kkey[0],round(kkey[1]+k,2)]}")
+print(f"at x: {kkey[0]} at y: {kkey[1]-k} value is: {grid_dict[kkey[0],round(kkey[1]-k,2)]}")
+
+
+
+
+
+evaluated_pde = evaluate_pde_at_key(kkey, h, k)
 
 print("Evaluated PDE at key:", evaluated_pde)
 # Solve the equation for x
