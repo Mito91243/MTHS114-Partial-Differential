@@ -250,8 +250,8 @@ if difference_type == "FD":
  def forward_diff(key):
    val_boundary = grid_dict[key]
    val = val_boundary + (k * user_defined_function(key[0]))
-   updates_dict[(key[0], key[1]+k)] = val
-   #print(f"At x: {key[0]} , At y: {round(key[1]+k,2)} , Value is {val}")
+   updates_dict[(key[0], round(key[1]+k,2))] = val
+   print(f"At x: {key[0]} , At y: {round(key[1]+k,2)} , Value is {val}")
 
 
  # Calculate backward differences but store them in updates_dict
@@ -338,10 +338,10 @@ def evaluate_pde_at_key(key, h, k):
     subs_dict = {
        #replace with x if we are at a point in the grid that has value 0 aka unkown value
         u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
-        u(x+h_val, t): x if grid_dict.get((x_val+h, t_val), 0) == 0 else grid_dict.get((x_val+h, t_val), 0),
-        u(x-h_val, t): x if grid_dict.get((x_val-h, t_val), 0) == 0 else grid_dict.get((x_val-h, t_val), 0),
-        u(x, t+k_val): x if grid_dict.get((x_val, t_val+k), 0) == 0 else grid_dict.get((x_val, t_val+k), 0),
-        u(x, t-k_val): x if grid_dict.get((x_val, t_val-k), 0) == 0 else grid_dict.get((x_val, t_val-k), 0),
+        u(x+h_val, t): x if grid_dict.get((round(x_val+h,2), t_val), 0) == 0 else grid_dict.get((round(x_val+h,2), t_val), 0),
+        u(x-h_val, t): x if grid_dict.get((round(x_val-h,2), t_val), 0) == 0 else grid_dict.get((round(x_val-h,2), t_val), 0),
+        u(x, t+k_val): x if grid_dict.get((x_val, round(t_val+k,2)), 0) == 0 else grid_dict.get((x_val, round(t_val+k,2)), 0),
+        u(x, t-k_val): x if grid_dict.get((x_val, round(t_val-k,2)), 0) == 0 else grid_dict.get((x_val, round(t_val-k,2)), 0),
         h_val: h,
         k_val: k
         # Add more substitutions for other terms if needed
@@ -355,7 +355,7 @@ def evaluate_pde_at_key(key, h, k):
 
 # Evaluate the PDE at the wanted key
 # TASK: FOR LOOP GOES HERE TO CALCULATE ALL GRID WITH GIVEN PDE
-kkey = (0.5,0.8)
+kkey = (0.4,0.3)
 
 
 
