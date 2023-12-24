@@ -204,8 +204,8 @@ if not np.isinf(x_end):
    update_value(x_end,i)
 
 
-#for key, value in grid_dict.items():
-    #print(f"Key: {key}, Value: {value}")
+for key, value in grid_dict.items():
+    print(f"Key: {key}, Value: {value}")
 
 
 #******************************************************************************** Formulas ********************************************************************************

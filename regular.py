@@ -204,8 +204,7 @@ if not np.isinf(x_end):
    update_value(x_end,i)
 
 
-#for key, value in grid_dict.items():
-    #print(f"Key: {key}, Value: {value}")
+
 
 
 #******************************************************************************** Formulas ********************************************************************************
@@ -223,7 +222,7 @@ if difference_type == "BD":
  def backward_diff(key):
    val_boundary = grid_dict[key]
    val = val_boundary - (k * user_defined_function(key[0]))
-   updates_dict[(key[0], key[1]-k)] = val
+   updates_dict[key[0], round(key[1]-k,2)] = val
    #print(f"At x: {key[0]} , At y: {key[1]-k} , Value is {val}")
 
 
@@ -250,8 +249,8 @@ if difference_type == "FD":
  def forward_diff(key):
    val_boundary = grid_dict[key]
    val = val_boundary + (k * user_defined_function(key[0]))
-   updates_dict[(key[0], round(key[1]+k,2))] = val
-   print(f"At x: {key[0]} , At y: {round(key[1]+k,2)} , Value is {val}")
+   updates_dict[key[0], round(key[1]+k,2)] = val
+   #print(f"At x: {key[0]} , At y: {round(key[1]+k,2)} , Value is {val}")
 
 
  # Calculate backward differences but store them in updates_dict
@@ -267,7 +266,8 @@ if difference_type == "FD":
 #************************************************** Forward ************************************************** 
 
 
-
+#for key, value in grid_dict.items():
+    #print(f"Key: {key}, Value: {value}")
 
 
 #************************************************** PDE ************************************************** 
@@ -275,8 +275,12 @@ if difference_type == "FD":
 h_val, k_val = symbols('h k')
 u = Function('u')
 
+# Handle if the pde equation has different difference formula from the Inital condition
+#difference_type_pde = input("Enter PDE Difference Type (None if not mentioned): ")
+#difference_type = difference_type if difference_type_pde == "None" else difference_type_pde
 
-# Define the finite difference expressions using SymPy
+
+# Define the finite difference expressions as functions
 def uxx():
     return (u(x+h_val, t) - 2*u(x, t) + u(x-h_val, t)) / h_val**2
 
@@ -307,6 +311,7 @@ def create_pde(user_pde_input):
     lhs_term = user_pde_input.split('=')[0].strip()
     rhs_term = user_pde_input.split('=')[1].strip()
 
+#Dictionary of what each letter in pde equation equates to as a function
     sympy_locals = {
         'u': u(x, t),
         'uxx': uxx(),
@@ -372,11 +377,18 @@ key_input = input("Enter the point coordinates (format 'x, y'): ")
 
 # Parse the user input
 xx, yy = parse_key_input(key_input)
-kkey = (xx,yy)
+kkey = (round(xx,2),round(yy,2))
 
+print(t_start_for_loop)
+print(t_end_for_loop)
+
+# Handle the
+k_temp = k
+if(t_start_for_loop > t_end_for_loop):
+    k_temp = -k
 
 for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
- for j in np.arange(t_start_for_loop, t_end_for_loop+k, k):
+ for j in np.arange(t_start_for_loop, t_end_for_loop+k, k_temp):
   if round(i,2) != x_start and round(i,2) != x_end and round(j,2) != t_start and round(j,2) != t_end:       
     i = round(i,2)
     j = round(j,2)
@@ -392,9 +404,9 @@ for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
        else:
         updates_dict[i, round(j-k,2)] = temp_list[0]
     
-       print(f"X: {i} , Y: {j-k} Value: {temp_list[0]}")
+       #print(f"X: {i} , Y: {j-k} Value: {temp_list[0]}")
        grid_dict.update(updates_dict)
-       print(f"X: {i} Y: {j} Value: {updates_dict[i,j]}")
+       #print(f"X: {i} Y: {j} Value: {updates_dict[i,j]}")
 
 
 
@@ -452,3 +464,8 @@ if difference_type == "CD":
 #* Implement Central Difference
 #* Take multiple intial conditions (maybe)
 #* Implement pde for whole grid
+#* Imaginary Points to the left and to the top and to the bottom of the grid
+#* Difference type of the pde is defaulted to central difference unless mentioned otherwise
+#* The pde equation can have t or x aka x coordinate or y coordinate
+#* Backward difference (Look at photo from tutorial on my mobile)
+#* Check why when grid is looking down the pde doesn't function properly
