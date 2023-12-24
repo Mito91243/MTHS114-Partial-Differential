@@ -2,109 +2,45 @@
 
 from sympy import symbols, Function, Eq, sympify, solve
 
-# Define symbols
-x, t, h_val, k_val = symbols('x t h k')
-u = Function('u')
-
-difference_type = "FD"
-# Define the finite difference expressions using SymPy
-def uxx():
-    return (u(x+h_val, t) - 2*u(x, t) + u(x-h_val, t)) / h_val**2
-
-def utt():
-    return (u(x, t+k_val) - 2*u(x, t) + u(x, t-k_val)) / k_val**2
-
-def ux():
-    if difference_type == "FD":
-     return (u(x+h_val, t) - u(x, t)) / h_val
-    elif difference_type == "BD":
-     return (u(x+h_val, t) - u(x-h_val, t)) / h_val
-    elif difference_type == "CD":
-     return (u(x+h_val, t) - u(x-h_val, t)) / h_val*2
-    
-def ut():
-    if difference_type == "FD":
-     return (u(x, t+k_val) - u(x, t)) / k_val
-    elif difference_type == "BD":
-     return (u(x, t) - u(x, t-k_val)) / k_val
-    elif difference_type == "CD":
-     return (u(x, t+k_val) - u(x, t-k_val)) / k_val*2
 
 
 
-# Function to create a PDE using finite difference formulas
-def create_pde(user_pde_input):
-    # Parse the user input
-    lhs_term = user_pde_input.split('=')[0].strip()
-    rhs_term = user_pde_input.split('=')[1].strip()
+"""
+# Helper Function to use when interpereting the key input
+def parse_key_input(user_input):
+    # Split the input by comma
+    x_str, y_str = user_input.split(',')
 
-    sympy_locals = {
-        'u': u(x, t),
-        'uxx': uxx(),
-        'utt': utt(),
-        'ux': ux(),
-        'ut': ut()
-    }
+    # Convert the split strings into numbers
+    x_val = float(x_str.strip())
+    y_val = float(y_str.strip())
 
-    # Handle the left hand side of the pde as a general expression
-    lhs_expr = sympify(lhs_term, locals=sympy_locals)
+    return x_val, y_val
 
-    # Handle the right-hand side of the PDE as a general expression
-    rhs_expr = sympify(rhs_term, locals=sympy_locals)
+# Prompt the user for the key
+key_input = input("Enter the point coordinates (format 'x, y'): ")
 
-    # Create the PDE as an equation
-    pde = Eq(lhs_expr, rhs_expr)
-    return pde
-
-# Example PDE input from the user
-pde_input = input("Enter PDE: ")
-
-# Create the finite difference PDE
-fd_pde = create_pde(pde_input)
-
-def evaluate_pde_at_key(key, h, k):
-    # Substitute the key into the PDE
-    x_val, t_val = key
-
-    # Create a dictionary of all terms that need to be substituted
-    subs_dict = {
-       #replace with x if we are at a point in the grid that has value 0 aka unkown value
-        u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
-        u(x+h_val, t): x if grid_dict.get((x_val+h_val, t_val), 0) == 0 else grid_dict.get((x_val+h_val, t_val), 0),
-        u(x-h_val, t): x if grid_dict.get((x_val-h_val, t_val), 0) == 0 else grid_dict.get((x_val-h_val, t_val), 0),
-        u(x, t+k_val): x if grid_dict.get((x_val, t_val+k_val), 0) == 0 else grid_dict.get((x_val, t_val+k_val), 0),
-        u(x, t-k_val): x if grid_dict.get((x_val, t_val-k_val), 0) == 0 else grid_dict.get((x_val, t_val-k_val), 0),
-        h_val: h,
-        k_val: k
-        # Add more substitutions for other terms if needed
-    }
-
-    # Substitute the finite difference expressions into the PDE
-    pde_evaluated = fd_pde.subs(subs_dict)
-
-    return pde_evaluated
+# Parse the user input
+x, y = parse_key_input(key_input)
 
 
-# Example grid dictionary and key
-grid_dict = {
-    (0.4, 0.3): 7.048, 
-    (0.6, 0.3): 7.108, 
-    (0.2, 0.3): 7.012, 
-    (0.4, 0.6): 0,  # Set the value of utt to 0
-    (0.4, 0): 7
-}
-key = (0.4, 0.3)
-h = 0.2
-k = 0.3
-
-# Evaluate the PDE at the key
-evaluated_pde = evaluate_pde_at_key(key, h, k)
-
-print("Evaluated PDE at key:", evaluated_pde)
-# Solve the equation for x
-solution = solve(evaluated_pde, x)
-print("Solution for x: ", solution)
-
+for j in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+ for i in np.arange(t_start_for_loop, t_end_for_loop+k, k):
+  print("!!!!")
+  if j != x_start and j != x_end:       
+    i = round(i,2)
+    j = round(j,2)
+    print("11")
+    if grid_dict[j,i] == 0:
+       temp_key = (j,i)
+       print("1")
+       evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
+       print("2")
+       updates_dict[j, i] = solve(evaluated_pde,x)
+       print("3")
+       grid_dict.update(updates_dict)
+       print("4")
+"""
 
 
 
