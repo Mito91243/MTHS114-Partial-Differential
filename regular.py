@@ -154,7 +154,7 @@ x_end_for_loop = 5*h if x_end == float('inf') else x_end
 grid_dict = {}
 for i in np.arange(t_start_for_loop, t_end_for_loop+k, k):
    for j in np.arange(x_start_for_loop, x_end_for_loop+h, h):
-      grid_dict[round(j,2),round(i,2)] = 0
+      grid_dict[round(j,2),round(i,2)] = None
 
 
 # Helper Function to handle corner values
@@ -316,14 +316,12 @@ difference_type_pde = "CD" if difference_type_pde == "None" else difference_type
 # Define the finite difference expressions as functions
 def uxx():
     #TO BE TESTED
-    if difference_type == "CD":
-        return 2*h*u(x,t) / h**2
     return (u(x+h_val, t) - 2*u(x, t) + u(x-h_val, t)) / h_val**2
 
 def utt():
     #TO BE TESTED
     if difference_type == "CD":
-       return 2*k*u(x,t) / k**2
+       return ((2*u(x, t+k_val)) - (2*u(x, t)) - (2*k*u(x, t))) / k_val**2
     return (u(x, t+k_val) - 2*u(x, t) + u(x, t-k_val)) / k_val**2
 
 def ux():
@@ -368,6 +366,7 @@ def create_pde(user_pde_input):
 
     # Create the PDE as an equation
     pde = Eq(lhs_expr, rhs_expr)
+    print(pde)
     return pde
 
 # Example PDE input from the user
@@ -383,11 +382,11 @@ def evaluate_pde_at_key(key, h, k):
     # Create a dictionary of all terms that need to be substituted
     subs_dict = {
        #replace with x if we are at a point in the grid that has value 0 aka unkown value
-        u(x, t): x if grid_dict.get((x_val, t_val), 0) == 0 else grid_dict.get((x_val, t_val), 0),
-        u(x+h_val, t): x if grid_dict.get((round(x_val+h,2), t_val), 0) == 0 else grid_dict.get((round(x_val+h,2), t_val), 0),
-        u(x-h_val, t): x if grid_dict.get((round(x_val-h,2), t_val), 0) == 0 else grid_dict.get((round(x_val-h,2), t_val), 0),
-        u(x, t+k_val): x if grid_dict.get((x_val, round(t_val+k,2)), 0) == 0 else grid_dict.get((x_val, round(t_val+k,2)), 0),
-        u(x, t-k_val): x if grid_dict.get((x_val, round(t_val-k,2)), 0) == 0 else grid_dict.get((x_val, round(t_val-k,2)), 0),
+        u(x, t): x if grid_dict.get((x_val, t_val), 0) == None else grid_dict.get((x_val, t_val), 0),
+        u(x+h_val, t): x if grid_dict.get((round(x_val+h,2), t_val), 0) == None else grid_dict.get((round(x_val+h,2), t_val), 0),
+        u(x-h_val, t): x if grid_dict.get((round(x_val-h,2), t_val), 0) == None else grid_dict.get((round(x_val-h,2), t_val), 0),
+        u(x, t+k_val): x if grid_dict.get((x_val, round(t_val+k,2)), 0) == None else grid_dict.get((x_val, round(t_val+k,2)), 0),
+        u(x, t-k_val): x if grid_dict.get((x_val, round(t_val-k,2)), 0) == None else grid_dict.get((x_val, round(t_val-k,2)), 0),
         h_val: h,
         k_val: k
         # Add more substitutions for other terms if needed
@@ -419,17 +418,15 @@ key_input = input("Enter the point coordinates (format 'x, y'): ")
 xx, yy = parse_key_input(key_input)
 kkey = (round(xx,2),round(yy,2))
 
-print(t_start_for_loop)
-print(t_end_for_loop)
-
 # Handle the
 k_temp = k
 if(t_start_for_loop > t_end_for_loop):
     k_temp = -k
 
-for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
- for j in np.arange(t_start_for_loop, t_end_for_loop+k, k_temp):
-  if round(i,2) != x_start and round(i,2) != x_end and round(j,2) != t_start and round(j,2) != t_end:       
+if difference_type != "CD":
+ for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+  for j in np.arange(t_start_for_loop, t_end_for_loop+k, k_temp):
+   if round(i,2) != x_start and round(i,2) != x_end and round(j,2) != t_start and round(j,2) != t_end:       
     i = round(i,2)
     j = round(j,2)
     print(f"X: {i} Y: {j} Value: {grid_dict[i,j]}")
@@ -440,18 +437,48 @@ for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
        temp_list = solve(evaluated_pde,x)
        #Based on what type of Difference we are working on how to store value
        if difference_type == "FD":
-         updates_dict[i, round(j+k,2)] = temp_list[0]
+         if len(temp_list) > 0:
+          updates_dict[i, round(j+k,2)] = temp_list[0]
        else:
-        updates_dict[i, round(j-k,2)] = temp_list[0]
+        if len(temp_list) > 0:
+         updates_dict[i, round(j-k,2)] = temp_list[0]
     
-       #print(f"X: {i} , Y: {j-k} Value: {temp_list[0]}")
        grid_dict.update(updates_dict)
-       print(f"X: {i} Y: {j} Value: {updates_dict[i,j]}")
-
 
 
 # Now apply the updates to grid_dict
+if difference_type == "CD":
+  updates_dict = {}
+  for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+    for j in np.arange(t_start_for_loop, t_start_for_loop+k, k_temp):
+        i = round(i,2)
+        j = round(j,2)
+        if round(i,2) != x_start and round(i,2) != x_end:
+            temp_key = (i,j)
+            evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
+            print(evaluated_pde)
+            # Store in a temp value to extract it as int from list 
+            temp_list = solve(evaluated_pde,x)
+            #Based on what type of Difference we are working on how to store value
 
+            print(f"X: {i} Y: {j+k} Value: {temp_list}")
+            grid_dict[i, round(j+k,2)] = temp_list[0]
+
+
+    for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+        i = round(i,2)
+        j = round(t_start_for_loop+k,2)
+        if round(i,2) != x_start and round(i,2) != x_end:
+            temp_key = (i,j)
+            evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
+            print(evaluated_pde)
+            # Store in a temp value to extract it as int from list 
+            temp_list = solve(evaluated_pde,x)
+            #Based on what type of Difference we are working on how to store value
+
+            print(f"X: {i} Y: {j+k} Value: {temp_list}")
+            if len(temp_list) > 0:
+             grid_dict[i, round(j+k,2)] = temp_list[0]
 
 
 #TESTNG
@@ -505,3 +532,6 @@ print(f"at x: {kkey[0]} at y: {kkey[1]} value is: {grid_dict[kkey[0],kkey[1]]}")
 #* The pde equation can have t or x aka x coordinate or y coordinate
 #* Backward difference (Look at photo from tutorial on my mobile)
 #* Check why when grid is looking down the pde doesn't function properly
+
+
+

@@ -248,3 +248,36 @@ if difference_type == "CD":
  # Instead of getting the point relative to other just change the final formula in the pde
  # u(i-h,j) = u(i+h,j) - 2*h*u(i,j)
  # uxx = 2*h*u(i,j) / h**2
+# Now apply the updates to grid_dict
+if difference_type == "CD":
+  updates_dict = {}
+  for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+    for j in np.arange(t_start_for_loop, t_start_for_loop+k, k_temp):
+        i = round(i,2)
+        j = round(j,2)
+        if round(i,2) != x_start and round(i,2) != x_end:
+            temp_key = (i,j)
+            evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
+            print(evaluated_pde)
+            # Store in a temp value to extract it as int from list 
+            temp_list = solve(evaluated_pde,x)
+            #Based on what type of Difference we are working on how to store value
+
+            print(f"X: {i} Y: {j+k} Value: {temp_list}")
+            grid_dict[i, round(j+k,2)] = temp_list[0]
+
+
+    for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+        i = round(i,2)
+        j = round(t_start_for_loop+k,2)
+        if round(i,2) != x_start and round(i,2) != x_end:
+            temp_key = (i,j)
+            evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
+            print(evaluated_pde)
+            # Store in a temp value to extract it as int from list 
+            temp_list = solve(evaluated_pde,x)
+            #Based on what type of Difference we are working on how to store value
+
+            print(f"X: {i} Y: {j+k} Value: {temp_list}")
+            if len(temp_list) > 0:
+             grid_dict[i, round(j+k,2)] = temp_list[0]
