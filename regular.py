@@ -208,7 +208,6 @@ if not np.isinf(x_end):
 
 
 #******************************************************************************** Formulas ********************************************************************************
-k_CD = k
 # If grid is in the -Y direction get the correct K again
 if k < 0:
   k = -k
@@ -265,43 +264,6 @@ if difference_type == "FD":
  grid_dict.update(updates_dict)
 
 #************************************************** Forward ************************************************** 
-
-
-
-
-
-
-
-
-
-
-
-#! TOP IMPORTANT
-#************************************************** Central ************************************************** 
-
-
-
-#************************************************** Central ************************************************** 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #************************************************** PDE ************************************************** 
  
@@ -488,50 +450,8 @@ print(f"at x: {kkey[0]} at y: {kkey[1]} value is: {grid_dict[kkey[0],kkey[1]]}")
 #print(f"at x: {kkey[0]} at y: {kkey[1]+k} value is: {grid_dict[kkey[0],round(kkey[1]+k,2)]}")
 #print(f"at x: {kkey[0]} at y: {kkey[1]-k} value is: {grid_dict[kkey[0],round(kkey[1]-k,2)]}")
 
-
-
-
-
-
-
- 
 #************************************************** PDE ************************************************** 
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#******************************************************************************** Tasks ********************************************************************************
-#* Implement Central Difference
-#* Take multiple intial conditions (maybe)
-#* Implement pde for whole grid
-#* Imaginary Points to the left and to the top and to the bottom of the grid
-#* Difference type of the pde is defaulted to central difference unless mentioned otherwise
-#* The pde equation can have t or x aka x coordinate or y coordinate
-#* Backward difference (Look at photo from tutorial on my mobile)
-#* Check why when grid is looking down the pde doesn't function properly
-
+ 
 
 
