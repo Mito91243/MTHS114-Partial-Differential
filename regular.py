@@ -208,6 +208,7 @@ if not np.isinf(x_end):
 
 
 #******************************************************************************** Formulas ********************************************************************************
+k_CD = k
 # If grid is in the -Y direction get the correct K again
 if k < 0:
   k = -k
@@ -266,8 +267,40 @@ if difference_type == "FD":
 #************************************************** Forward ************************************************** 
 
 
-#for key, value in grid_dict.items():
-    #print(f"Key: {key}, Value: {value}")
+
+
+
+
+
+
+
+
+
+#! TOP IMPORTANT
+#************************************************** Central ************************************************** 
+
+
+
+#************************************************** Central ************************************************** 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #************************************************** PDE ************************************************** 
@@ -276,31 +309,37 @@ h_val, k_val = symbols('h k')
 u = Function('u')
 
 # Handle if the pde equation has different difference formula from the Inital condition
-#difference_type_pde = input("Enter PDE Difference Type (None if not mentioned): ")
-#difference_type = difference_type if difference_type_pde == "None" else difference_type_pde
+difference_type_pde = input("Enter PDE Difference Type (None if not mentioned): ")
+difference_type_pde = "CD" if difference_type_pde == "None" else difference_type_pde
 
 
 # Define the finite difference expressions as functions
 def uxx():
+    #TO BE TESTED
+    if difference_type == "CD":
+        return 2*h*u(x,t) / h**2
     return (u(x+h_val, t) - 2*u(x, t) + u(x-h_val, t)) / h_val**2
 
 def utt():
+    #TO BE TESTED
+    if difference_type == "CD":
+       return 2*k*u(x,t) / k**2
     return (u(x, t+k_val) - 2*u(x, t) + u(x, t-k_val)) / k_val**2
 
 def ux():
-    if difference_type == "FD":
+    if difference_type_pde == "FD":
      return (u(x+h_val, t) - u(x, t)) / h_val
-    elif difference_type == "BD":
+    elif difference_type_pde == "BD":
      return (u(x+h_val, t) - u(x-h_val, t)) / h_val
-    elif difference_type == "CD":
+    elif difference_type_pde == "CD":
      return (u(x+h_val, t) - u(x-h_val, t)) / h_val*2
     
 def ut():
-    if difference_type == "FD":
+    if difference_type_pde == "FD":
      return (u(x, t+k_val) - u(x, t)) / k_val
-    elif difference_type == "BD":
+    elif difference_type_pde == "BD":
      return (u(x, t) - u(x, t-k_val)) / k_val
-    elif difference_type == "CD":
+    elif difference_type_pde == "CD":
      return (u(x, t+k_val) - u(x, t-k_val)) / k_val*2
 
 
@@ -317,7 +356,8 @@ def create_pde(user_pde_input):
         'uxx': uxx(),
         'utt': utt(),
         'ux': ux(),
-        'ut': ut()
+        'ut': ut(),
+        #'uxt' : uxt()
     }
 
     # Handle the left hand side of the pde as a general expression
@@ -406,7 +446,7 @@ for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
     
        #print(f"X: {i} , Y: {j-k} Value: {temp_list[0]}")
        grid_dict.update(updates_dict)
-       #print(f"X: {i} Y: {j} Value: {updates_dict[i,j]}")
+       print(f"X: {i} Y: {j} Value: {updates_dict[i,j]}")
 
 
 
@@ -432,32 +472,28 @@ print(f"at x: {kkey[0]} at y: {kkey[1]} value is: {grid_dict[kkey[0],kkey[1]]}")
 
     
 
-#************************************************** Central ************************************************** 
-"""
-if difference_type == "CD":
-# Temporary dictionary for updates
- updates_dict = {}
-
- def Central_diff(key, k, func):
-   val_boundary = grid_dict[key]
-   val = val_boundary - (k * func(key[0]))
-   updates_dict[(key[0], key[1]-k)] = val
-   #print(f"At x: {key[0]} , At y: {key[1]} , Value is {val}")
 
 
- # Calculate backward differences but store them in updates_dict
- for key, value in list(grid_dict.items()):
-    #Check which is bigger the upper or lower boundary
-    if t_end > t_start:
-        #if we are on the upper boundary
-        if key[1] == t_end:
-            if key[0] != x_start and key[0] != x_end:      
-                Central_diff(key, k, user_defined_function)
- # Now apply the updates to grid_dict
- grid_dict.update(updates_dict)
-"""
 
-#************************************************** Central ************************************************** 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #******************************************************************************** Tasks ********************************************************************************

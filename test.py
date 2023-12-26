@@ -1,6 +1,6 @@
 # TESTING THE PDE INPUT
 
-from sympy import symbols, Function, Eq, sympify, solve
+#from sympy import symbols, Function, Eq, sympify, solve
 
 
 
@@ -188,3 +188,63 @@ pde_input = input("Enter PDE: ")
 fd_pde = create_pde(pde_input)
 
 """
+
+"""
+if difference_type == "CD":
+   #Expand the grid 1 point in each direction
+   x_start_for_loop_temp = x_start_for_loop - h
+   x_end_for_loop_temp = x_end_for_loop + h
+   t_start_for_loop_temp = t_start_for_loop - k
+   t_end_for_loop_temp = t_end_for_loop + k
+
+   #for i in np.arange(x_start_for_loop_temp, x_end_for_loop_temp+h, h):
+      #val = grid_dict[i+h,t_start_for_loop+k] - user_defined_function(i)*2*k
+      #grid_dict[i,t_start_for_loop_temp] = val
+      #print(f"At x: {i} , At y: {t_start_for_loop} , Value is {val}")
+      
+
+   #determine which point in the grid has only 1 unkown
+   for i in np.arange(x_start_for_loop, x_end_for_loop+h, h):
+    for j in np.arange(t_start_for_loop, t_end_for_loop+k, k_CD):
+       
+       c = 0
+
+       val_left = grid_dict[i-h,j]
+       val_right = grid_dict[i+h,j] 
+       val_up = grid_dict[i,j+k] 
+       val_down = grid_dict[i,j-k] 
+       
+       if grid_dict[i-h,j] == 0:
+          c += 1
+       if grid_dict[i+h,j]  == 0:
+          c += 1
+       if grid_dict[i,j+k]  == 0:
+          c += 1
+       if grid_dict[i,j-k] == 0:
+          c += 1
+"""
+    # For loop on all thegrod of you find no points that has only 1 0 around it You know you will create the imaginary
+    # For loop starts from inside the grid . aka don't include any boundary points
+    # The points next to any boundary are always the ones needed
+    #? Cirteria to which boundary should i move into?
+    # I think you should look for it depending on the pde. maybe a little helper function to look for uxx or utt in the pde
+    # Then depedning on the wanted point if we need its left or right i should go for left boundary or right boundary or top or down
+    # 
+    
+   #Look at pde equation and determine points that you will need utt / uxx tells you will need 1 above , 1 below , 1 right , 1 left
+   #? How to know the differnce between when i need imaginary points and when i don't ?
+   #Depending on required point determine if you will go left <-- or top or bottom
+   #Depending on the direction where you find a point that only has 1 X and all others in the pde equation are available
+   #Get the 3 imaginary points on the axis you went in the direction of
+   #Make for loop to go from the
+   
+
+ # BASMAGHA LE TA7T
+ # Instead of getting the point relative to other just change the final formula in the pde
+ # u(i,j-k) = u(i,j+k) - 2*k*u(i,j)
+ # utt = 2*k*u(i,j) / k**2
+
+ # BASMAGHA LE Shmal
+ # Instead of getting the point relative to other just change the final formula in the pde
+ # u(i-h,j) = u(i+h,j) - 2*h*u(i,j)
+ # uxx = 2*h*u(i,j) / h**2
