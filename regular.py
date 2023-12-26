@@ -328,7 +328,6 @@ def create_pde(user_pde_input):
 
     # Create the PDE as an equation
     pde = Eq(lhs_expr, rhs_expr)
-    print(pde)
     return pde
 
 # Example PDE input from the user
@@ -391,7 +390,6 @@ if difference_type != "CD":
    if round(i,2) != x_start and round(i,2) != x_end and round(j,2) != t_start and round(j,2) != t_end:       
     i = round(i,2)
     j = round(j,2)
-    print(f"X: {i} Y: {j} Value: {grid_dict[i,j]}")
     if grid_dict[i,j] != 0:
        temp_key = (i,j)
        evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
@@ -418,12 +416,10 @@ if difference_type == "CD":
         if round(i,2) != x_start and round(i,2) != x_end:
             temp_key = (i,j)
             evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
-            print(evaluated_pde)
             # Store in a temp value to extract it as int from list 
             temp_list = solve(evaluated_pde,x)
             #Based on what type of Difference we are working on how to store value
 
-            print(f"X: {i} Y: {j+k} Value: {temp_list}")
             grid_dict[i, round(j+k,2)] = temp_list[0]
 
 
@@ -433,12 +429,10 @@ if difference_type == "CD":
         if round(i,2) != x_start and round(i,2) != x_end:
             temp_key = (i,j)
             evaluated_pde = evaluate_pde_at_key(temp_key, h, k)
-            print(evaluated_pde)
             # Store in a temp value to extract it as int from list 
             temp_list = solve(evaluated_pde,x)
             #Based on what type of Difference we are working on how to store value
 
-            print(f"X: {i} Y: {j+k} Value: {temp_list}")
             if len(temp_list) > 0:
              grid_dict[i, round(j+k,2)] = temp_list[0]
 
